@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<header>
+	<link href="/assets/global/plugins/jstree/src/themes/default/style.min.css" rel="stylesheet">
+	<link href="/assets/global/plugins/datatables/dataTables.min.css" rel="stylesheet">
+	<link href="/assets/global/css/style.css" rel="stylesheet">
+	<link href="/assets/global/css/theme.css" rel="stylesheet">
+	<link href="/assets/global/css/ui.css" rel="stylesheet">
+	<link href="/assets/css/layout.css" rel="stylesheet">
+	<link href="/assets/css/custom.css" rel="stylesheet">
+</header>
+<body>
+	<div v-html="message" id="app"></div>
+</body>
+<script src="/assets/global/plugins/vue/vue.js"></script>
+<script src="/assets/global/plugins/axios/axios.js"></script>
+<script>
+axios.post('/console/userInfo',{mode : 'U'}).then((result)=>{
+	var app = new Vue({
+		el : "#app",
+		data : {
+			message : result.data
+		}
+	});
+});
+</script>
+</html>

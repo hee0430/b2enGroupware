@@ -1,0 +1,51 @@
+		#--------- H2 TCP  ---------
+		#default.url=jdbc:h2:tcp://35.197.160.240//home/xmlmania/h2/data//Repository
+
+		#--------- H2 EMBEDDED  ---------
+		#default.driverClass=org.h2.Driver
+		#default.url=jdbc:h2:${asterHome}/.repo/h2//Repository
+		##default.url=jdbc:h2:tcp://127.0.0.1/${asterHome}/.repo/h2//Repository
+		#default.username=admin
+		#default.password=b2en2017
+
+		#--------- mariadb  ---------
+		#default.driverClass=org.mariadb.jdbc.Driver
+		#default.url=jdbc:mysql://104.196.238.188:3306/mps
+		#default.username=mps
+		#default.password=b2en2017
+
+		#--------- postgres test local ---------
+		#default.driverClass=org.postgresql.Driver
+		#default.url=jdbc:postgresql://192.168.1.217:5432/taster
+		#default.username=taster
+		#default.password=b2en2017
+
+		default.driverClass=org.postgresql.Driver
+		default.url=jdbc:postgresql://172.16.1.4:5432/dssp
+		default.username=dssp
+		default.password=wosksrhddb4
+
+
+		#--------- postgres test server ---------
+		#default.driverClass=org.postgresql.Driver
+		#default.url=jdbc:postgresql://192.168.1.217:5432/aster
+		#default.username=aster
+		#default.password=b2en2017
+
+		#--------- oracle ---------
+		#default.driverClass=oracle.jdbc.driver.OracleDriver
+		#default.url=jdbc:oracle:thin:@192.168.1.217:1521:XE
+		#default.username=aster
+		#default.password=b2en2017
+
+		#--------- tibero 2019/04/11 까지 사용가능 ---------
+		#default.driverClass=com.tmax.tibero.jdbc.TbDriver
+		#default.url=jdbc:tibero:thin:@59.15.214.125:8629:tibero
+		#default.username=aster
+		#default.password=b2en2017
+
+		#--------- postgres test server ---------
+		#default.driverClass=org.postgresql.Driver
+		#default.url=jdbc:postgresql://192.168.1.217:5432/foi
+		#default.username=foi
+		#default.password=foi

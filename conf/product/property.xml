@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment></comment>
+	<entry key="console.ip">127.0.0.1</entry>
+	<entry key="console.http.port">7777</entry>
+	<entry key="console.broker.port">7776</entry>
+	<entry key="console.jmx.port">7775</entry>
+	<entry key="alarm.send.enable">false</entry>
+	<entry key="alarm.impl.class">com.b2en.integration.aster.alarm.sender.DummyMessageSender</entry>
+	<entry key="alarm.impl.properties"></entry>
+	<entry key="database.driverClass">org.postgresql.Driver</entry>
+	<entry key="database.url">jdbc:postgresql://localhost:port/database</entry>
+	<entry key="database.username">database</entry>
+	<entry key="database.password">password</entry>
+	<entry key="database.idleMaxAgeInMinutes">240</entry>
+	<entry key="database.idleConnectionTestPeriodInMinutes">60</entry>
+	<entry key="database.maxConnectionsPerPartition">25</entry>
+	<entry key="database.minConnectionsPerPartition">1</entry>
+	<entry key="database.partitionCount">3</entry>
+	<entry key="database.acquireIncrement">5</entry>
+	<entry key="database.statementsCacheSize">100</entry>
+	<entry key="server.ssl.enabled">false</entry>
+	<entry key="server.ssl.key-store"></entry>
+	<entry key="server.ssl.key-store-password"></entry>
+	<entry key="server.ssl.key-password"></entry>
+	<entry key="server.ssl.key-alias"></entry>
+	<entry key="server.ssl.trust-store"></entry>
+	<entry key="server.ssl.trust-store-password"></entry>
+	<entry key="login.butten.name">B2en Blog</entry>
+	<entry key="login.butten.link">http://blog.b2en.com/</entry>	
+</properties>

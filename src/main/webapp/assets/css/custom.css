@@ -1,0 +1,25 @@
+.link{
+	/* font-weight: bold; */
+	cursor: pointer;
+}
+
+.link:HOVER{
+	text-decoration: underline;
+}
+
+.link2{
+	cursor: pointer;
+}
+
+
+.modal-header .close {
+	color : white;
+}
+
+.ellipsis{
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	word-wrap:normal;
+	overflow:hidden;
+}
+

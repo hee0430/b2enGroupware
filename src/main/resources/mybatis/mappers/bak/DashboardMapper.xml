@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DashboardMapper">
+	<select id="SELECT_BOARD_MNTRNG_TRGT_MANAGE_LIST" parameterType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel" resultType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel">
+		/* [DashboardMapper.SELECT_BOARD_MNTRNG_TRGT_MANAGE_LIST] 대시보드 인터페이스 모니터링 대상 조회 (사용자별) */
+		SELECT
+			I.INTRFC_ID AS ID
+			,I.INTRFC_NM AS NM
+			,I.INTRFC_SEQ AS SEQ
+			,(SELECT ID FROM USER_MANAGE U WHERE U.USER_SEQ = B.USER_SEQ) AS USER_ID
+			,B.USER_SEQ AS USER_SEQ
+			,B.DSPY_ORDER AS DSPY_ORDER
+			,B.TRGT_TY AS TRGT_TY
+			,B.TRGT_SEQ AS TRGT_SEQ
+		FROM
+			INTRFC_INFO I
+			LEFT OUTER JOIN BOARD_MNTRNG_TRGT_MANAGE B ON I.INTRFC_SEQ = B.TRGT_SEQ AND B.user_seq = #{userSeq}
+		ORDER BY I.INTRFC_ID ASC
+	</select>
+	<select id="SELECT_BOARD_MNTRNG_TRGT_INTERFACE_LIST" parameterType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel" resultType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel">
+		/* [DashboardMapper.SELECT_BOARD_MNTRNG_TRGT_INTERFACE_LIST] 대시보드 인터페이스 모니터링 대상 조회(사용자별) */
+		SELECT
+			I.INTRFC_ID AS ID,
+			I.INTRFC_NM AS NM,
+			B.DSPY_ORDER AS DSPY_ORDER,
+			B.USER_SEQ AS USER_SEQ
+		FROM  BOARD_MNTRNG_TRGT_MANAGE B, INTRFC_INFO I
+		WHERE B.TRGT_SEQ = I.INTRFC_SEQ
+		AND B.USER_SEQ = #{userSeq}
+		ORDER BY DSPY_ORDER
+	</select>
+	<select id="SELECT_BOARD_MNTRNG_TRGT_MANAGE_CHART_DATA_ONE" parameterType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel" resultType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel">
+		/* [DashboardMapper.SELECT_BOARD_MNTRNG_TRGT_MANAGE_CHART_DATA_ONE] 대시보드 인터페이스 모니터링 정보  조회  - 인터페이스 한개 */
+		SELECT
+			I.INTRFC_ID AS ID
+			,(SELECT MAX(END_DT) AS LAST_EXC_DT FROM TRNSC_MNTRNG X WHERE X.INTRFC_ID = I.INTRFC_ID) AS LAST_EXC_DT
+			,TOTAL_CO
+			,ERROR_CO
+			,(SELECT A.PROCESS_STTUS FROM TRNSC_MNTRNG A WHERE A.BEGIN_DT = M.LAST_EXC_DT AND A.INTRFC_ID = M.ID GROUP BY A.PROCESS_STTUS ) AS PROCESS_STTUS
+		FROM INTRFC_INFO I LEFT OUTER JOIN  (
+			SELECT
+				T.INTRFC_ID AS  ID
+				,MAX(T.BEGIN_DT) AS LAST_EXC_DT
+				,COALESCE(SUM(CASE WHEN T.PROCESS_STTUS = 'S' THEN 1 END),0) AS TOTAL_CO
+				,COALESCE(SUM(CASE WHEN T.PROCESS_STTUS = 'E' THEN 1 END),0) AS ERROR_CO
+			FROM  TRNSC_MNTRNG T
+			WHERE
+				<![CDATA[
+				T.BEGIN_DT >= #{beginDtTimestamp, jdbcType=TIMESTAMP}
+				AND T.BEGIN_DT < #{entDtTimestamp, jdbcType=TIMESTAMP}
+				]]>
+			GROUP BY T.INTRFC_ID
+		)M  ON I.intrfc_id = M.ID
+		WHERE I.INTRFC_ID = #{id}
+	</select>
+	<insert id="INSERT_BOARD_MNTRNG_TRGT_MANAGE"  parameterType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel">
+		/* [DashboardMapper.INSERT_BOARD_MNTRNG_TRGT_MANAGE]  대시보드 모니터링 대상 등록 (사용자별) */
+		INSERT INTO BOARD_MNTRNG_TRGT_MANAGE(USER_SEQ, DSPY_ORDER, TRGT_TY, TRGT_SEQ)
+		VALUES(#{userSeq}, #{dspyOrder}, #{trgtTy}, #{trgtSeq})
+	</insert>
+	<delete id="DELETE_BOARD_MNTRNG_TRGT_MANAGE"  parameterType="com.b2en.integration.aster.console.web.dashboard.model.MonitoringTargetModel">
+		/* [DashboardMapper.DELETE_BOARD_MNTRNG_TRGT_MANAGE]  대시보드 모니터링 대상 삭제 (사용자별) */
+		DELETE FROM BOARD_MNTRNG_TRGT_MANAGE WHERE USER_SEQ = #{userSeq}
+	</delete>
+	<select id="SELECT_TRNSC_MNTRNG_COUNT_CHART" parameterType="Map" resultType="com.b2en.integration.aster.console.util.UpperKeyMap">
+		/* [DashboardMapper.SELECT_TRNSC_MNTRNG_COUNT_CHART]  대시보드 상단 처리 수 조회  */
+		SELECT
+			COALESCE(SUM(1),0) AS TOTAL
+			,COALESCE(SUM(CASE WHEN A.PROCESS_STTUS = 'S' THEN 1 END),0) AS SUCCESS
+			,COALESCE(SUM(CASE WHEN A.PROCESS_STTUS = 'E' THEN 1 END),0) AS ERROR
+			,COALESCE(SUM(CASE WHEN A.PROCESS_STTUS = 'P' THEN 1 END),0) AS PROCESS
+		FROM TRNSC_MNTRNG A
+		<if test="dateType == 'TODAY'.toString() ">
+		<![CDATA[
+		WHERE A.BEGIN_DT >= #{CURRENT_DATE} AND A.BEGIN_DT < #{NEXT_DATE}
+		]]>
+		</if>
+		<if test="dateType == 'YESTERDAY'.toString() ">
+		<![CDATA[
+		WHERE A.BEGIN_DT >= #{PREV_DATE} AND A.BEGIN_DT < #{CURRENT_DATE}
+		]]>
+		</if>
+	</select>
+	<select id="SELECT_TRNSC_MNTRNG_TRANSACTION_CHART" parameterType="Map" resultType="com.b2en.integration.aster.console.util.UpperKeyMap">
+		/* [DashboardMapper.SELECT_TRNSC_MNTRNG_TRANSACTION_CHART] 대시보드 트랜잭션 차트  */
+		SELECT
+			BEGIN_DT ,PROCESS_STTUS
+		FROM TRNSC_MNTRNG A
+		<![CDATA[
+			WHERE A.BEGIN_DT >= #{startDate, jdbcType=TIMESTAMP}
+		]]>
+	</select>
+	<select id="SELECT_TRCKNG_MNTRNG_EVENT_MSSAGE" parameterType="String" resultType="String">
+		/* [DashboardMapper.SELECT_TRCKNG_MNTRNG_EVENT_MSSAGE] 오류 트랜잭션 오류 사유 조회 */
+		SELECT EVENT_MSSAGE FROM TRCKNG_MNTRNG WHERE TRNSC_ID = #{trnscId} AND EVENT_TY = 'EXCEPTION'
+	</select>
+
+	<select id="SELECT_TRANSACTION_INFO_CHART_START_TO_END" parameterType="com.b2en.integration.aster.model.monitoring.Transaction" resultType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [DashboardMapper.SELECT_TRANSACTION_INFO_CHART_START_TO_END]트랜잭션 정보 조회 - 조회 시간 지정(차트용) */
+		<![CDATA[
+		SELECT
+			A.TRNSC_ID AS TRNSC_ID
+			,A.INTRFC_ID AS INTRFC_ID
+			,B.INTRFC_NM AS INTRFC_NM
+			,A.PROCESS_CN AS PROCESS_CN
+			,A.PROCESS_STTUS AS PROCESS_STTUS
+			,A.BEGIN_DT AS BEGIN_DT_TIMESTAMP
+			,A.END_DT AS END_DT_TIMESTAMP
+		FROM
+			TRNSC_MNTRNG A, INTRFC_INFO B
+		WHERE
+			A.INTRFC_ID = B.INTRFC_ID
+			AND A.PROCESS_STTUS != 'P'
+			AND PROCESS_DT >=  #{beginDtTimestamp}
+			AND PROCESS_DT < #{endDtTimestamp}
+		]]>
+	</select>
+</mapper>

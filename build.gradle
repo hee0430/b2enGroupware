@@ -1,0 +1,67 @@
+plugins {
+    // Apply the java-library plugin to add support for Java Library
+    id 'java-library'
+}
+
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+ext {
+    SPRING_BOOT_VERSION = '2.1.4.RELEASE'
+    CAMEL_VERSION="2.22.1"
+}
+
+dependencies {
+	//spring boot	
+  	compile("org.springframework.boot:spring-boot-starter-web:$SPRING_BOOT_VERSION")	
+	compile("org.springframework.boot:spring-boot-starter-tomcat:$SPRING_BOOT_VERSION")
+	compile("org.springframework.boot:spring-boot-starter-web:$SPRING_BOOT_VERSION")
+	compile("org.springframework.boot:spring-boot-starter-jdbc:$SPRING_BOOT_VERSION")
+	compile("org.springframework.boot:spring-boot-starter-websocket:$SPRING_BOOT_VERSION")
+	compile("org.springframework.boot:spring-boot-starter-activemq:$SPRING_BOOT_VERSION")
+	compile("org.springframework.boot:spring-boot-starter-cache:$SPRING_BOOT_VERSION")
+	testRuntime("org.springframework.boot:spring-boot-starter-test:$SPRING_BOOT_VERSION")
+	
+	//JSP
+	runtime("org.apache.tomcat.embed:tomcat-embed-jasper:8.5.23")			
+	compile("javax.servlet:jstl:1.2")
+	compile("org.apache.tiles:tiles-jsp:3.0.8")
+
+	//CAMEL
+	
+		
+	compile("org.apache.camel:camel-spring-boot-starter:$CAMEL_VERSION")
+	compile("org.apache.camel:camel-core:$CAMEL_VERSION")
+	compile("org.apache.camel:camel-netty4:$CAMEL_VERSION")
+	compile("org.apache.camel:camel-netty4-http:$CAMEL_VERSION") 
+	
+	//DATABASE
+	compile("commons-dbcp:commons-dbcp:1.4")
+	compile("org.postgresql:postgresql:42.2.2")			
+	
+	//Mybatis
+	compile("org.mybatis:mybatis:3.4.5")
+	compile("org.mybatis:mybatis-spring:1.3.1")
+	compile("com.jolbox:bonecp:0.8.0.RELEASE")
+			
+	//Util
+	//compile("com.github.oshi:oshi-core:3.10.0")
+	//compile("com.github.jsqlparser:jsqlparser:1.1")
+	//compile("net.sf.ehcache:ehcache:2.10.1")
+	compile("com.opencsv:opencsv:4.1")
+	compile("org.apache.poi:poi:3.17")
+	compile("org.apache.poi:poi-ooxml:3.17")
+	compile("org.apache.commons:commons-lang3:3.6")
+	compile("commons-fileupload:commons-fileupload:1.3.3")			
+	compile("com.google.code.gson:gson:2.8.2")
+	compileOnly("org.springframework.boot:spring-boot-devtools:$SPRING_BOOT_VERSION")
+			
+	
+  	
+    compile("commons-collections:commons-collections:3.2")
+    testCompile("junit:junit:4.+")
+    
+}

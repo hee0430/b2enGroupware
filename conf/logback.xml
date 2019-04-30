@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${consoleHome}/log/console.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${consoleHome}/log/%d{yyyy-MM-dd}/console.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{1} - %msg %n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="Transaction" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${consoleHome}/log/transaction.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${consoleHome}/log/%d{yyyy-MM-dd}/transaction.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{1} - %msg %n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="Notification" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${consoleHome}/log/notification.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${consoleHome}/log/%d{yyyy-MM-dd}/notification.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{1} - %msg %n</pattern>
+		</encoder>
+	</appender>
+
+
+	<appender name="Resource" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${consoleHome}/log/resource.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${consoleHome}/log/%d{yyyy-MM-dd}/resource.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{1} - %msg %n</pattern>
+		</encoder>
+	</appender>
+
+
+	<logger name="org.springframework" level="info" />
+	<logger name="org.apache.camel" level="info" />
+	<logger name="org.apache.activemq.store.kahadb" level="warn" />
+	<logger name="org.apache.activemq.broker" level="warn" />
+	<logger name="org.apache.activemq.transport" level="warn" />
+	<logger name="org.apache.activemq.util.ThreadPoolUtils" level="warn" />
+	<logger name="org.apache.camel.spring" level="warn" />
+	<logger name="oshi.util.platform.windows.WmiUtil" level="warn" />
+	<logger name="org.mybatis.spring.SqlSessionUtils" level="warn" />
+	<logger name="org.mybatis.spring.transaction.SpringManagedTransaction" level="warn" />
+
+	<!-- 주기적 수행 쿼리 로깅 제외 -->
+	<logger name="DashboardMapper.SELECT_TRNSC_MNTRNG_COUNT_CHART" level="warn" />
+	<logger name="DashboardMapper.SELECT_TRNSC_MNTRNG_TRANSACTION_CHART" level="warn" />
+	<logger name="DashboardMapper.SELECT_BOARD_MNTRNG_TRGT_MANAGE_CHART_DATA_ONE" level="warn" />
+	<logger name="DashboardMapper.SELECT_TRCKNG_MNTRNG_EVENT_MSSAGE" level="warn" />
+	<logger name="DashboardMapper.SELECT_TRANSACTION_INFO_CHART_START_TO_END" level="warn" />
+	<logger name="DashboardMapper.SELECT_TRCKNG_MNTRNG_AGENT_ERROR_COUNT" level="warn" />
+	<logger name="DashboardMapper.SELECT_BOARD_MNTRNG_TRGT_MANAGE_LIST" level="warn" />
+	<logger name="MonitoringMapper.INSERT_RESRCE_MNTRNG" level="warn" />
+	<logger name="AgentConfigMapper.SELECT_DATASOURCE_INFO_LIST" level="warn" />
+	<logger name="AgentConfigMapper.SELECT_PARTN_AGENT_INFO_LIST" level="warn" />
+	<logger name="AgentConfigMapper.SELECT_HBASE_DATASOURCE_LIST" level="warn" />
+	<logger name="AgentConfigMapper.SELECT_HTTP_DATASOURCE_LIST" level="warn" />
+	<logger name="AgentConfigMapper.SELECT_FTP_DATASOURCE_LIST" level="warn" />
+	<logger name="AgentConfigMapper.SELECT_RELAY_CONFIG_INFO" level="warn" />
+	<logger name="ConsoleMapper.INSERT_EXCP_MSSAGE_CL_UNKNOWN" level="warn" />
+	<logger name="ConsoleMapper.UPDATE_EXCP_MSSAGE_CL" level="warn" />
+	<logger name="ConsoleMapper.INSERT_DSTB_HIST_MANAGE_DETAIL" level="warn" />
+	<logger name="ConsoleMapper.SELECT_TRNSC_EXCEPTION_MESSAGE_LIST" level="warn" />
+	<logger name="TransactionMapper.INSERT_TRANSACTION_TEMP" level="warn" />
+	<logger name="TransactionMapper.DELETE_TRANSACTION_TEMP" level="warn" />
+	<logger name="TransactionMapper.SELECT_TRANSACTION_TEMP" level="warn" />
+	<logger name="TransactionMapper.UPDATE_TRANSACTION_TEMP" level="warn" />
+
+	<logger name="Notification" level="INFO" additivity="false">
+		<appender-ref ref="Notification" />
+	</logger>
+
+	<logger name="Resource" level="INFO" additivity="false">
+		<appender-ref ref="Resource" />
+	</logger>
+
+	<logger name="TransactionMapper" level="INFO" additivity="false">
+		<appender-ref ref="Transaction" />
+	</logger>
+
+	<root level="DEBUG">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>

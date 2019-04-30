@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<properties>
+	<comment>
+		org.postgresql.Driver
+		jdbc:postgresql://59.15.214.125:5432/taster
+		taster
+		b2en2017
+		{enc}u8b0S8+YCCpXt7xEgK3ShodxNobBJlAvQPJ/mJyomGjltXKD3M33VuTg2xp2ZE73
+
+		org.postgresql.Driver
+		jdbc:postgresql://210.97.42.242:21732/dssp
+		dssp
+		wosksrhddb4
+		{enc}u8b0S8+YCCpXt7xEgK3ShrHjXkCbs/nAWoi22R5Dl1Z6sHHWNDmnYgoFjqjYm7Iu
+	</comment>
+	<entry key="console.ip">192.168.1.59</entry>
+	<entry key="console.http.port">7777</entry>
+	<entry key="console.broker.port">7776</entry>
+	<entry key="console.jmx.port">7775</entry>
+	<entry key="alarm.send.enable">true</entry>
+	<entry key="alarm.impl.class">com.b2en.integration.aster.alarm.sender.TelegramMessageSender</entry>
+	<entry key="alarm.impl.properties">bots/693609483:AAEcoxpC8l4A3ANAqtW_fd61Qeogym_NYKg?chatId=-1001200583938</entry>
+	<entry key="database.driverClass">org.postgresql.Driver</entry>
+ 	<entry key="database.url">jdbc:postgresql://192.168.1.217:5432/aster</entry>
+	<entry key="database.username">aster</entry>
+	<entry key="database.password">{enc}u8b0S8+YCCpXt7xEgK3ShodxNobBJlAvQPJ/mJyomGjltXKD3M33VuTg2xp2ZE73</entry>
+
+<!-- 	<entry key="database.url">jdbc:postgresql://210.97.42.242:21732/dssp</entry>
+	<entry key="database.username">dssp</entry>
+	<entry key="database.password">{enc}u8b0S8+YCCpXt7xEgK3ShrHjXkCbs/nAWoi22R5Dl1Z6sHHWNDmnYgoFjqjYm7Iu</entry>
+ -->
+ 
+<!-- 	<entry key="database.driverClass">com.microsoft.sqlserver.jdbc.SQLServerDriver</entry>
+	<entry key="database.url">jdbc:sqlserver://172.16.1.78:1433;databaseName=aster</entry>
+	<entry key="database.username">aster</entry>
+	<entry key="database.password">{enc}u8b0S8+YCCpXt7xEgK3ShodxNobBJlAvQPJ/mJyomGjltXKD3M33VuTg2xp2ZE73</entry> -->
+	
+	<entry key="database.idleMaxAgeInMinutes">240</entry>
+	<entry key="database.idleConnectionTestPeriodInMinutes">60</entry>
+	<entry key="database.maxConnectionsPerPartition">20</entry>
+	<entry key="database.minConnectionsPerPartition">1</entry>
+	<entry key="database.partitionCount">3</entry>
+	<entry key="database.acquireIncrement">5</entry>
+	<entry key="database.statementsCacheSize">100</entry>
+	<entry key="database.second.enabled">false</entry><!--
+	<entry key="database.second.driverClass">org.postgresql.Driver</entry>
+	<entry key="database.second.url">jdbc:postgresql://59.15.214.125:5432/taster</entry>
+	<entry key="database.second.username">taster</entry>
+	<entry key="database.second.password">{enc}u8b0S8+YCCpXt7xEgK3ShodxNobBJlAvQPJ/mJyomGiYCPJEws1i5kkR/VQhnEmG</entry>
+	<entry key="database.second.idleMaxAgeInMinutes">240</entry>
+	<entry key="database.second.idleConnectionTestPeriodInMinutes">60</entry>
+	<entry key="database.second.maxConnectionsPerPartition">2</entry>
+	<entry key="database.second.minConnectionsPerPartition">1</entry>
+	<entry key="database.second.partitionCount">1</entry>
+	<entry key="database.second.acquireIncrement">5</entry>
+	<entry key="database.second.statementsCacheSize">100</entry> -->
+	<entry key="server.ssl.enabled">false</entry>
+	<entry key="server.ssl.key-store">C:\\Users\\hee\\aster.jks</entry>
+	<entry key="server.ssl.key-store-password">{enc}u8b0S8+YCCpXt7xEgK3ShodxNobBJlAvQPJ/mJyomGiYCPJEws1i5kkR/VQhnEmG</entry>
+	<entry key="server.ssl.key-password">{enc}u8b0S8+YCCpXt7xEgK3ShodxNobBJlAvQPJ/mJyomGiYCPJEws1i5kkR/VQhnEmG</entry>
+	<entry key="server.ssl.key-alias">aster</entry>
+	<entry key="server.ssl.trust-store">C:\\Users\\hee\\aster.ts</entry>
+	<entry key="server.ssl.trust-store-password">{enc}u8b0S8+YCCpXt7xEgK3ShodxNobBJlAvQPJ/mJyomGiYCPJEws1i5kkR/VQhnEmG</entry>
+	<entry key="login.butten.name">GUARDIAN</entry>
+	<entry key="login.butten.link">http://210.97.42.242:18088/mng/loginMain.do</entry>
+</properties>
