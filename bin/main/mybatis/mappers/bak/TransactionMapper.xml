@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TransactionMapper">
+	<select id="SELECT_TRANSACTION_EXIST"  parameterType="com.b2en.integration.aster.model.monitoring.Transaction" resultType="int">
+		/* [CONSOLE] 트랜잭션 데이터 유무 조회  */
+		SELECT COUNT(1) CNT FROM TRNSC_MNTRNG WHERE TRNSC_ID  = #{trnscId} AND INTRFC_ID = #{intrfcId}
+	</select>
+	<insert id="INSERT_TRANSACTION" parameterType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [CONSOLE] 트랜잭션 데이터  등록 */
+		INSERT INTO TRNSC_MNTRNG (
+			TRNSC_ID
+			,INTRFC_ID
+			,BEGIN_AGENT
+			,END_AGENT
+			,TARGET_QY
+			,BEGIN_DT
+			,PROCESS_STTUS
+			,PROCESS_CN
+			,PROCESS_DT
+		)VALUES(
+			#{trnscId}
+			,#{intrfcId}
+			,#{beginAgent}
+			,#{endAgent}
+			,#{targetQy}
+			,#{beginDtTimestamp, jdbcType=TIMESTAMP}
+			,#{processSttus}
+			,#{processCn, jdbcType=VARCHAR}
+			,#{processDt, jdbcType=TIMESTAMP}
+		)
+	</insert>
+	<update id="UPDATE_TRANSACTION" parameterType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [CONSOLE] 트랜잭션 데이터  수정 */
+		UPDATE TRNSC_MNTRNG SET
+			END_DT = #{endDtTimestamp, jdbcType=TIMESTAMP}
+			,PROCESS_STTUS = #{processSttus}
+			<if test="targetQy > 0 ">
+			,TARGET_QY = #{targetQy}
+			</if>
+			,DATA_SIZE = #{dataSize}
+			,PROCESS_DT = #{processDt, jdbcType=TIMESTAMP}
+		WHERE
+			TRNSC_ID  = #{trnscId}
+			AND INTRFC_ID = #{intrfcId}
+	</update>
+
+	<update id="UPDATE_TRANSACTION_EXCP_MSSAGE" parameterType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [CONSOLE] 트랜잭션 EXCP_MSSAGE 수정 */
+		UPDATE TRNSC_MNTRNG SET
+			EXCP_MSSAGE = #{excpMssage}
+		WHERE
+			TRNSC_ID  = #{trnscId}
+	</update>
+	<insert id="INSERT_TRACKING" parameterType="com.b2en.integration.aster.model.monitoring.Tracking">
+		/* [CONSOLE] 트래킹  데이터  등록 */
+		INSERT INTO TRCKNG_MNTRNG (
+			TRCKNG_ID
+			,TRNSC_ID
+			,INTRFC_ID
+			,AGENT_ID
+			,AGENT_NO
+			,EVENT_GROUP_SEQ
+			,EVENT_TY
+			,EVENT_DT
+			,PROCESS_QY
+			,EVENT_MSSAGE
+		) VALUES (
+			#{trckngId},
+			#{trnscId},
+			#{intrfcId},
+			#{agentId},
+			#{agentNo},
+			#{eventGroupSeq},
+			#{eventTy},
+			#{eventDtTimestamp, jdbcType=TIMESTAMP},
+			#{processQy},
+			#{eventMssage, jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="INSERT_TRANSACTION_TEMP" parameterType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [TransactionMapper.INSERT_TRANSACTION_TEMP] 임시 트랜잭션 데이터  등록 */
+		INSERT INTO TRNSC_MNTRNG_TEMP (
+			TRNSC_ID
+			, INTRFC_ID
+			, BEGIN_AGENT
+			, END_AGENT
+			, TARGET_QY
+			, DATA_SIZE
+			, BEGIN_DT
+			, END_DT
+			, PROCESS_STTUS
+			, PROCESS_CN
+			, EXCP_MSSAGE
+			, PROCESS_DT
+			, RETRY_CNT
+		)VALUES(
+			#{trnscId}
+			, #{intrfcId}
+			, #{beginAgent}
+			, #{endAgent}
+			, #{targetQy}
+			, #{dataSize}
+			, #{beginDtTimestamp, jdbcType=TIMESTAMP}
+			, #{endDtTimestamp, jdbcType=TIMESTAMP}
+			, #{processSttus}
+			, #{processCn, jdbcType=VARCHAR}
+			, #{excpMssage}
+			, #{processDt, jdbcType=TIMESTAMP}
+			, #{retryCnt}
+		)
+	</insert>
+	<delete id="DELETE_TRANSACTION_TEMP" parameterType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [TransactionMapper.DELETE_TRANSACTION_TEMP] 임시 트랜잭션 데이터 삭제*/
+		DELETE FROM TRNSC_MNTRNG_TEMP WHERE  TRNSC_ID = #{trnscId}
+	</delete>
+	<select id="SELECT_TRANSACTION_TEMP" parameterType="com.b2en.integration.aster.model.monitoring.Transaction" resultType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [TransactionMapper.SELECT_TRANSACTION_TEMP] 임시 트랜잭션 데이터  조회 */
+		SELECT
+			TRNSC_ID
+			, INTRFC_ID
+			, BEGIN_AGENT
+			, END_AGENT
+			, TARGET_QY
+			, DATA_SIZE
+			, BEGIN_DT AS BEGIN_DT_TIMESTAMP
+			, END_DT AS END_DT_TIMESTAMP
+			, PROCESS_STTUS
+			, PROCESS_CN
+			, EXCP_MSSAGE
+			, PROCESS_DT
+			, RETRY_CNT
+		FROM
+			TRNSC_MNTRNG_TEMP
+		WHERE
+		<![CDATA[
+		 RETRY_CNT < 5
+		]]>
+	</select>
+	<delete id="UPDATE_TRANSACTION_TEMP" parameterType="com.b2en.integration.aster.model.monitoring.Transaction">
+		/* [TransactionMapper.UPDATE_TRANSACTION_TEMP] 임시 트랜잭션 데이터 수정 */
+		UPDATE TRNSC_MNTRNG_TEMP SET RETRY_CNT = #{retryCnt} WHERE  TRNSC_ID = #{trnscId}
+	</delete>
+
+</mapper>

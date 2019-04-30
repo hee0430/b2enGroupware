@@ -1,12 +1,14 @@
-plugins {
-    // Apply the java-library plugin to add support for Java Library
-    id 'java-library'
-}
+apply plugin: 'war'
+apply plugin: 'org.springframework.boot'
 
-repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
+sourceCompatibility = '1.8' 
+targetCompatibility = '1.8'
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+repositories {    
     jcenter()
+    mavenCentral()
 }
 
 ext {
@@ -15,9 +17,8 @@ ext {
 }
 
 dependencies {
-	//spring boot	
-  	compile("org.springframework.boot:spring-boot-starter-web:$SPRING_BOOT_VERSION")	
-	compile("org.springframework.boot:spring-boot-starter-tomcat:$SPRING_BOOT_VERSION")
+	//spring boot
+	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:$SPRING_BOOT_VERSION")
 	compile("org.springframework.boot:spring-boot-starter-web:$SPRING_BOOT_VERSION")
 	compile("org.springframework.boot:spring-boot-starter-jdbc:$SPRING_BOOT_VERSION")
 	compile("org.springframework.boot:spring-boot-starter-websocket:$SPRING_BOOT_VERSION")
@@ -31,8 +32,6 @@ dependencies {
 	compile("org.apache.tiles:tiles-jsp:3.0.8")
 
 	//CAMEL
-	
-		
 	compile("org.apache.camel:camel-spring-boot-starter:$CAMEL_VERSION")
 	compile("org.apache.camel:camel-core:$CAMEL_VERSION")
 	compile("org.apache.camel:camel-netty4:$CAMEL_VERSION")
@@ -59,9 +58,22 @@ dependencies {
 	compile("com.google.code.gson:gson:2.8.2")
 	compileOnly("org.springframework.boot:spring-boot-devtools:$SPRING_BOOT_VERSION")
 			
-	
-  	
     compile("commons-collections:commons-collections:3.2")
     testCompile("junit:junit:4.+")
     
+}
+
+buildscript { 
+	repositories { 
+		maven { 
+			url 'https://repo.spring.io/libs-snapshot' 
+		} 
+	} 
+	dependencies {
+		 classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.0.BUILD-SNAPSHOT' 
+	} 
+} 
+
+springBoot {
+    mainClassName = 'com.b2en.groupware.console.startup.Initializer'
 }

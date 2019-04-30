@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ConsoleMapper">
+	<select id="SELECT_MENU_MANAGE_LIST"  parameterType="String" resultType="com.b2en.integration.aster.console.web.console.model.MenuModel">
+		/* [CONSOLE]콘솔 메뉴 목록 조회 */
+		<if test='_parameter == "admin".toString()'>
+			SELECT
+				MENU_SEQ
+				,M.MENU_CODE
+				,UPPER_MENU_CODE
+				,MENU_NM
+				,MENU_URL
+				,MENU_LEVEL
+				,MENU_ORD
+				,SBMNU_ORD
+				,MENU_TY
+				,MENU_ICON
+			FROM MENU_MANAGE M
+			ORDER BY MENU_ORD, SBMNU_ORD, MENU_LEVEL
+		</if>
+		<if test='_parameter != "admin".toString()'>
+		SELECT
+			MENU_SEQ
+			,MENU_CODE
+			,UPPER_MENU_CODE
+			,MENU_NM
+			,MENU_URL
+			,MENU_LEVEL
+			,MENU_ORD
+			,SBMNU_ORD
+			,MENU_TY
+			,MENU_ICON
+		FROM (
+		SELECT
+			MENU_SEQ
+			,M.MENU_CODE
+			,UPPER_MENU_CODE
+			,MENU_NM
+			,MENU_URL
+			,MENU_LEVEL
+			,MENU_ORD
+			,SBMNU_ORD
+			,MENU_TY
+			,MENU_ICON
+		FROM MENU_MANAGE M, USER_MENU_AUTHOR A, USER_MANAGE U
+		WHERE M.MENU_CODE = A.MENU_CODE
+		AND A.USER_SEQ = U.USER_SEQ
+		AND U.ID = #{value}
+		UNION
+		/* 아무 권한이 없는 경우 메인 화면은 보여줘야 하므로 */
+		SELECT
+			MENU_SEQ
+			,M.MENU_CODE
+			,UPPER_MENU_CODE
+			,MENU_NM
+			,MENU_URL
+			,MENU_LEVEL
+			,MENU_ORD
+			,SBMNU_ORD
+			,MENU_TY
+			,MENU_ICON
+		FROM MENU_MANAGE M
+		WHERE MENU_CODE = 'SUMY00'
+		) T
+		ORDER BY MENU_ORD, SBMNU_ORD, MENU_LEVEL
+		</if>
+	</select>
+	<select id="SELECT_MENU_AUTH_LIST_BY_USER_ID" resultType="String" parameterType="String">
+		/* [ConsoleMapper.SELECT_MENU_AUTH_LIST_BY_USER_ID] */
+		SELECT
+			MENU_CODE
+		FROM
+			USER_MANAGE M, USER_MENU_AUTHOR A
+		WHERE
+			M.USER_SEQ = A.USER_SEQ
+		AND M.ID = #{value}
+	</select>
+	<select id="SELECT_RUTE_FROM_TO_AGENT_LIST" resultType="com.b2en.integration.aster.console.util.UpperKeyMap">
+		/* [CONSOLE]등록된 라우트 정보 조회 - FROM/TO 정보 생성용 */
+		SELECT INTRFC_ID, RUTE_ORDER, AGENT_ID
+		FROM(
+			SELECT INTRFC_ID, RUTE_ORDER, AGENT_ID
+			FROM RUTE_INFO
+			UNION
+			SELECT INTRFC_ID, RUTE_ORDER, AGENT_ID
+			FROM RUTE_INFO_WORK
+		)MERGE_T
+		ORDER BY INTRFC_ID ,RUTE_ORDER
+	</select>
+
+	<insert id="INSERT_DSTB_HIST_MANAGE" parameterType="com.b2en.integration.aster.console.web.console.model.DstbHistModel">
+		INSERT INTO DSTB_HIST_MANAGE (DSTB_SEQ, DSTB_VER, TRGT_SE, TRGT_ID, OPRTIN, CN, DSTB_DT)
+		VALUES(
+			#{dstbSeq},
+			#{dstbVer},
+			#{trgtSe},
+			#{trgtId},
+			#{oprtin},
+			#{cn},
+			#{dstbDt}
+		)
+	</insert>
+	<insert id="INSERT_DSTB_HIST_MANAGE_DETAIL" parameterType="com.b2en.integration.aster.console.web.console.model.DstbHistModel">
+		INSERT INTO DSTB_HIST_MANAGE_DETAIL (DSTB_DETAIL_SEQ, DSTB_SEQ, DSTB_AGENT, DSTB_STTUS, DSTB_SE, DSTB_DT, DSTB_MSSAGE)
+		VALUES(
+			#{dstbDetailSeq},
+			#{dstbSeq},
+			#{dstbAgent},
+			#{dstbSttus},
+			#{dstbSe},
+			#{dstbDt},
+			#{dstbMssage}
+		)
+	</insert>
+	<select id="SELECT_DSTB_HIST_MANAGE"  resultType="com.b2en.integration.aster.console.web.console.model.DstbHistModel" parameterType="com.b2en.integration.aster.console.web.console.model.DstbHistModel">
+		SELECT
+			DSTB_SEQ, DSTB_VER, TRGT_SE, TRGT_ID, OPRTIN, CN, DSTB_DT
+		FROM DSTB_HIST_MANAGE
+		WHERE
+			TRGT_ID = #{trgtId}
+		ORDER BY DSTB_SEQ DESC
+	</select>
+	<delete id="DELETE_DSTB_HIST_MANAGE" parameterType="com.b2en.integration.aster.console.web.console.model.DstbHistModel">
+		DELETE FROM DSTB_HIST_MANAGE WHERE TRGT_ID = #{trgtId}
+	</delete>
+	<select id="SELECT_USER_MANAGE" resultType="com.b2en.integration.aster.console.web.login.model.UserModel" parameterType="com.b2en.integration.aster.console.web.login.model.UserModel">
+		/* [ConsoleMapper.SELECT_USER_MANAGE] 사용자 정보 조회 */
+		SELECT
+			USER_SEQ, ID, NM, PASSWORD, USER_TY, EMAIL, MOBLPHON_NO, RM, PASSWORD_UPDT_DT
+		FROM USER_MANAGE
+		WHERE
+			ID = #{id}
+	</select>
+	<select id="SELECT_USER_MANAGE_LIST" parameterType="com.b2en.integration.aster.console.web.login.model.UserModel" resultType="com.b2en.integration.aster.console.web.login.model.UserModel">
+		/* [ConsoleMapper.SELECT_USER_MANAGE_LIST] 사용자 정보 조회 목록 */
+		SELECT
+			USER_SEQ, ID, NM, PASSWORD, USER_TY, EMAIL, MOBLPHON_NO, RM, PASSWORD_UPDT_DT
+		FROM USER_MANAGE
+		<if test="id != null">
+		WHERE ID = #{id}
+		</if>
+		ORDER BY USER_SEQ ASC
+	</select>
+
+	<insert id="INSERT_USER_MANAGE" parameterType="com.b2en.integration.aster.console.web.login.model.UserModel">
+		/* [ConsoleMapper.INSERT_USER_MANAGE] 사용자 정보 등록 */
+		INSERT INTO USER_MANAGE (USER_SEQ, ID, NM, PASSWORD, USER_TY, EMAIL, MOBLPHON_NO, RM, PASSWORD_UPDT_DT)
+		VALUES(
+			#{userSeq}
+			, #{id}
+			, #{nm}
+			, #{password}
+			, #{userTy}
+			, #{email, jdbcType=VARCHAR}			
+			, #{moblphonNo, jdbcType=VARCHAR}
+			, #{rm, jdbcType=VARCHAR}
+			, #{passwordUpdtDt}
+		)
+	</insert>
+	<update id="UPDATE_USER_MANAGE" parameterType="com.b2en.integration.aster.console.web.login.model.UserModel">
+		/* [ConsoleMapper.UPDATE_USER_MANAGE] 사용자 정보(일반) 수정 */
+		UPDATE USER_MANAGE SET
+			NM = #{nm}
+			, EMAIL = #{email, jdbcType=VARCHAR}			
+			, MOBLPHON_NO = #{moblphonNo, jdbcType=VARCHAR}
+			, RM = #{rm, jdbcType=VARCHAR}
+			<if test ="password != null">
+			, PASSWORD = #{password}
+			, PASSWORD_UPDT_DT = #{passwordUpdtDt}
+			</if>
+		WHERE ID = #{id}
+		AND USER_SEQ = #{userSeq}
+	</update>
+	<update id="UPDATE_USER_MANAGE_PASSWORD" parameterType="com.b2en.integration.aster.console.web.login.model.UserModel">
+		/* [ConsoleMapper.UPDATE_USER_MANAGE_PASSWORD] 사용자 정보(비밀번호) 수정 */
+		UPDATE USER_MANAGE SET
+			PASSWORD = #{password}
+			, PASSWORD_UPDT_DT = #{passwordUpdtDt}
+		WHERE ID = #{id}
+		AND USER_SEQ = #{userSeq}
+	</update>
+	<delete id="DELETE_USER_MANAGE" parameterType="com.b2en.integration.aster.console.web.login.model.UserModel">
+		/* [ConsoleMapper.DELETE_USER_MANAGE] 사용자 정보 삭제 */
+		DELETE
+		FROM USER_MANAGE
+		WHERE ID = #{id}
+		AND USER_SEQ = #{userSeq}
+		AND ID != 'admin'
+	</delete>
+
+	<select id="SELECT_INTERFACE_SUMMARY_COUNT" resultType="com.b2en.integration.aster.console.web.console.model.SummaryModel">
+		/* [ConsoleMapper.SELECT_INTERFACE_SUMMARY_COUNT] 인터페이스 상태 요약  */
+		SELECT
+			COUNT(*) INTRFC_TOTAL_CNT,
+			SUM(CASE WHEN LAST_DSTB_VER = DSTB_VER THEN 1 ELSE 0 END) INTRFC_DONE_CNT,
+			SUM(CASE WHEN LAST_DSTB_VER = DSTB_VER THEN 0 ELSE 1 END) INTRFC_TEMP_CNT,
+			SUM(CASE WHEN actvty_yn = 'Y' THEN 1 ELSE 0 END) INTRFC_ACTIVE_CNT,
+			SUM(CASE WHEN actvty_yn = 'N' THEN 1 ELSE 0 END) INTRFC_STOP_CNT
+		FROM (
+			SELECT
+				INTRFC_SEQ,
+				INTRFC_ID,
+				INTRFC_NM,
+				INTRFC_TY,
+				CASE
+					WHEN D.STTUS ='S' AND LAST_DSTB_VER != D.DSTB_VER THEN 'P'
+					WHEN D.STTUS ='F' AND LAST_DSTB_VER != D.DSTB_VER THEN 'F'
+					ELSE D.STTUS END AS STTUS,
+				SYNC_YN,
+				ACTVTY_YN,
+				TRNSC_LOG_YN,
+				MSSAGE_LOG_YN,
+				LAST_DSTB_VER,
+				D.DSTB_VER,
+				REGIST_DT,
+				REGIST_ID,
+				REGIST_IP,
+				UPDT_DT,
+				UPDT_ID,
+				UPDT_IP
+			FROM
+				INTRFC_INFO I
+				LEFT OUTER JOIN(
+						SELECT
+							G.TRGT_ID,
+							V.STTUS
+							,CASE WHEN V.STTUS ='S' THEN G.DSTB_VER ELSE(
+							<![CDATA[
+								SELECT MAX(X.DSTB_VER) FROM DSTB_HIST_MANAGE X WHERE X.DSTB_VER < G.DSTB_VER
+							]]>
+							)END AS DSTB_VER
+						FROM
+							DSTB_HIST_MANAGE G,
+							(
+								SELECT
+									DIST.TRGT_ID,
+									DIST.DSTB_SEQ,
+									CASE WHEN (
+										SELECT COUNT(1)
+										FROM DSTB_HIST_MANAGE_DETAIL DT
+										WHERE DIST.DSTB_SEQ = DT.DSTB_SEQ
+										AND DT.DSTB_STTUS = 'F'
+										AND DT.DSTB_DETAIL_SEQ = (
+											SELECT
+												MAX(DT.DSTB_DETAIL_SEQ)
+											FROM
+												DSTB_HIST_MANAGE_DETAIL DT
+											WHERE
+												DT.DSTB_SEQ= DIST.DSTB_SEQ
+										)
+									) = 1 THEN 'F' ELSE 'S' END AS STTUS
+								FROM (
+									SELECT
+										T.TRGT_ID,	MAX( DSTB_SEQ ) AS DSTB_SEQ
+									FROM
+										(
+											SELECT
+												A.DSTB_SEQ,
+												A.TRGT_ID
+											FROM
+												DSTB_HIST_MANAGE A
+												WHERE TRGT_SE='INTERFACE'
+										) T
+									GROUP BY
+										TRGT_ID
+								) DIST
+							) V
+						WHERE G.TRGT_ID = V.TRGT_ID
+						AND G.DSTB_SEQ = V.DSTB_SEQ
+					) D ON
+					I.INTRFC_ID = D.TRGT_ID
+		) T
+	</select>
+
+
+	<select id="SELECT_SYS_MANAGE_INTRFC_INFO_GROUP_COUNT"  resultType="com.b2en.integration.aster.console.web.console.model.SummaryModel">
+		/* [ConsoleMapper.SELECT_SYS_MANAGE_INTRFC_INFO_GROUP_COUNT]  시스템별 인터페이스 등록 상태 */
+		SELECT
+			S.SYS_NM AS SYS_NM, M.INSTT_NM,  COUNT(1) AS CNT
+		FROM
+			INTRFC_INFO I , SYS_MANAGE S, INSTT_MANAGE M
+		WHERE S.INSTT_SEQ = M.INSTT_SEQ
+		GROUP BY S.SYS_NM, M.INSTT_NM
+		ORDER BY COUNT(1) DESC
+	</select>
+
+	<select id="SELECT_INTRFC_INFO_RECENTLY_UPDATE"  resultType="com.b2en.integration.aster.console.web.console.model.SummaryModel">
+		/* [ConsoleMapper.SELECT_INTRFC_INFO_RECENTLY_UPDATE]  최근 업데이트 인터페이스  */
+		SELECT
+			INTRFC_ID, INTRFC_NM, UPDT_DT AS UPDT_DT_TIMESTAMP
+		FROM
+			INTRFC_INFO
+		WHERE UPDT_DT > #{updtDtTimestamp}
+		ORDER BY UPDT_DT DESC
+	</select>
+	<select id="SELECT_TRNSC_MNTRNG_ERROR_BY_INTRFC"  resultType="com.b2en.integration.aster.console.web.console.model.SummaryModel">
+		/* [ConsoleMapper.SELECT_TRNSC_MNTRNG_ERROR_BY_INTRFC]  인터페이스별 오류건수 */
+		SELECT I.INTRFC_ID, INTRFC_NM, T.CNT FROM (
+			SELECT INTRFC_ID, COUNT(1) AS CNT
+			FROM TRNSC_MNTRNG T
+			WHERE BEGIN_DT > #{updtDtTimestamp}
+			AND PROCESS_STTUS ='E'
+			GROUP BY INTRFC_ID
+		) T, INTRFC_INFO I
+		WHERE T.INTRFC_ID = I.INTRFC_ID
+		ORDER BY CNT DESC
+	</select>
+	<select id="SELECT_TRNSC_EXCEPTION_MESSAGE_LIST"  parameterType="com.b2en.integration.aster.console.web.console.model.SummaryModel" resultType="com.b2en.integration.aster.console.web.console.model.SummaryModel">
+		/* [ConsoleMapper.SELECT_TRNSC_EXCEPTION_PATTERN] 오류 패턴  */
+		SELECT  EXCP_MSSAGE AS EVENT_MSSAGE, COUNT(*) CNT
+		FROM TRNSC_MNTRNG T
+		WHERE END_DT >  #{updtDtTimestamp}
+		AND PROCESS_STTUS = 'E'
+		AND EXCP_MSSAGE IS NOT NULL
+		GROUP BY EXCP_MSSAGE
+	</select>
+	<select id="SELECT_TRNSC_STATS_INTRFC_FOR_SUMMARY" parameterType="com.b2en.integration.aster.console.web.statistics.model.StatisticsModel" resultType="com.b2en.integration.aster.console.web.statistics.model.StatisticsModel">
+		/* [ConsoleMapper.SELECT_TRNSC_STATS_INTRFC_FOR_SUMMARY]  메인 화면 주간 트랜잭션 처리량 조회 */
+		SELECT
+			CREAT_TIME,
+			T.INTRFC_ID,
+			TOT_TRNSC_CO,
+			FAILR_TRNSC_CO,
+			TOT_DATA_SIZE,
+			PEAK_TRNSC_HOUR,
+			PEAK_TRNSC_CO,
+			PEAK_DATA_SIZE,
+			TOT_ROW_CO,
+			I.INTRFC_NM
+		FROM
+			TRNSC_STATS_INTRFC_DE T, INTRFC_INFO I
+			<if test="selectMode == 'yesterday'.toString() ">
+		WHERE
+			CREAT_TIME = #{creatTime}
+			</if>
+			<if test="selectMode == 'week'.toString() ">
+			<![CDATA[
+		WHERE
+			CREAT_TIME >= #{creatTime} AND CREAT_TIME <= #{creatTimeEnd}
+			]]>
+			</if>
+			AND T.INTRFC_ID = I.INTRFC_ID
+		ORDER BY
+			CREAT_TIME,
+			INTRFC_ID
+	</select>
+	<select id="SELECT_EXCP_MSSAGE_CL" parameterType="com.b2en.integration.aster.console.web.console.model.ExceptionClassModel" resultType="com.b2en.integration.aster.console.web.console.model.ExceptionClassModel">
+		/* [ConsoleMapper.SELECT_EXCP_MSSAGE_CL] 오류 패턴  */
+		SELECT
+			EXCP_CL
+			, EXCP_MSSAGE
+		FROM
+			EXCP_MSSAGE_CL
+		WHERE USE_YN = 'Y'
+		<if test="excpMssage != null">
+			AND EXCP_MSSAGE = #{excpMssage}
+		</if>
+	</select>
+	<select id="SELECT_USER_MENU_AUTHOR_LIST" parameterType="com.b2en.integration.aster.console.web.login.model.UserMenuAuthModel" resultType="com.b2en.integration.aster.console.web.login.model.UserMenuAuthModel">
+		/* [ConsoleMapper.SELECT_USER_MENU_AUTHOR_LIST] 사용자별 메뉴권한 목록 */
+		SELECT
+		M.MENU_CODE, M.MENU_NM, A.AUTHOR
+		FROM MENU_MANAGE M LEFT OUTER JOIN USER_MENU_AUTHOR A
+		ON M.MENU_CODE = A.MENU_CODE AND A.USER_SEQ = #{userSeq}
+		ORDER BY  M.MENU_ORD, M.SBMNU_ORD
+	</select>
+
+	<delete id="DELETE_USER_MENU_AUTHOR" parameterType="com.b2en.integration.aster.console.web.login.model.UserMenuAuthModel">
+		/* [ConsoleMapper.SELECT_USER_MENU_AUTHOR_LIST] 사용자별 메뉴권한 삭제 */
+		DELETE FROM USER_MENU_AUTHOR WHERE USER_SEQ = #{userSeq}
+	</delete>
+	<insert id="INSERT_USER_MENU_AUTHOR" parameterType="com.b2en.integration.aster.console.web.login.model.UserMenuAuthModel">
+		/* [ConsoleMapper.INSERT_USER_MENU_AUTHOR] 사용자 메뉴권한 등록  */
+		INSERT INTO USER_MENU_AUTHOR
+		(USER_SEQ, MENU_CODE, AUTHOR)
+		VALUES(
+			#{userSeq}
+			, #{menuCode}
+			, #{author}
+		)
+	</insert>
+	<insert id="INSERT_EXCP_MSSAGE_CL_UNKNOWN" parameterType="Map">
+		/* [ConsoleMapper.INSERT_EXCP_MSSAGE_CL_UNKNOWN] 트랜잭션 모니터링 테이블의 오류중 오류 분류 테이블에 등록되어있지 않은 데이터를 오류 분류테이블에 임시 등록함 */
+		INSERT INTO EXCP_MSSAGE_CL
+		SELECT 'UNKNOWN', T.EXCP_MSSAGE,'N' FROM TRNSC_MNTRNG T
+		WHERE T.EXCP_MSSAGE  NOT IN (
+			SELECT MESG FROM (
+				SELECT
+					CASE
+						WHEN USE_YN = 'Y' THEN EXCP_CL
+						ELSE EXCP_MSSAGE
+					END AS MESG
+				FROM
+					EXCP_MSSAGE_CL
+				GROUP BY
+					EXCP_CL,
+					EXCP_MSSAGE,
+					USE_YN
+			)T  GROUP BY MESG
+		)
+		AND EXCP_MSSAGE IS NOT NULL
+		AND BEGIN_DT >= #{value}
+		GROUP BY  T.EXCP_MSSAGE
+	</insert>
+	<insert id="INSERT_PATCH_LBRRY" parameterType="com.b2en.integration.aster.console.web.library.model.LibraryModel">
+		/* [ConsoleMapper.INSERT_PATCH_LBRRY]  패치 라이브러리 등록 */
+		INSERT INTO PATCH_LBRRY
+		(PATCH_SEQ, PATCH_CM, PATCH_FILE, REGIST_DT)
+		VALUES(
+			#{patchSeq}
+			, #{patchCm}
+			, #{patchFile}
+			, #{registDt}
+		)
+	</insert>
+	<select id="SELECT_PATCH_LBRRY" parameterType="com.b2en.integration.aster.console.web.library.model.LibraryModel" resultType="com.b2en.integration.aster.console.web.library.model.LibraryModel">
+		/* [ConsoleMapper.SELECT_PATCH_LBRRY]  패치 라이브러리 목록 */
+		SELECT PATCH_SEQ, PATCH_CM, PATCH_FILE, REGIST_DT
+		FROM PATCH_LBRRY
+		<if test="patchSeq != null">
+		WHERE PATCH_SEQ = #{patchSeq}
+		</if>
+		ORDER BY PATCH_SEQ DESC
+	</select>
+	<delete id="DELETE_PATCH_LBRRY" parameterType="com.b2en.integration.aster.console.web.library.model.LibraryModel">
+		/* [ConsoleMapper.DELETE_PATCH_LBRRY]  패치 라이브러리 삭제 */
+		DELETE FROM  PATCH_LBRRY
+		WHERE PATCH_SEQ=#{patchSeq}
+	</delete>
+	<select id="SELECT_PATCH_HIST" parameterType="com.b2en.integration.aster.console.web.library.model.LibraryModel" resultType="com.b2en.integration.aster.console.web.library.model.LibraryModel">
+		/* [ConsoleMapper.SELECT_PATCH_HIST]  패치 히스토리 목록 */
+		SELECT
+			H.SEQ, H.PATCH_DT, H.PATCH_SEQ, L.PATCH_CM, L.PATCH_FILE, H.PATCH_TRGET, H.PATCH_RESULT, H.PATCH_RESULT_CN
+		FROM
+			PATCH_HIST H, PATCH_LBRRY L
+		WHERE H.PATCH_SEQ = L.PATCH_SEQ
+		<if test="seq != 0">
+			AND H.SEQ = #{seq}
+		</if>
+		ORDER BY PATCH_DT DESC
+	</select>
+	<insert id="INSERT_PATCH_HIST" parameterType="com.b2en.integration.aster.console.web.library.model.LibraryModel">
+		/* [ConsoleMapper.INSERT_PATCH_HIST]  패치 히스토리 등록 */
+		INSERT INTO PATCH_HIST
+		(SEQ, PATCH_DT, PATCH_SEQ, PATCH_TRGET, PATCH_RESULT, PATCH_RESULT_CN)
+		VALUES(
+			#{seq}
+			, #{patchDt}
+			, #{patchSeq}
+			, #{patchTrget}
+			, #{patchResult}
+			, #{patchResultCn}
+		)
+	</insert>
+	<select id="SELECT_TODAY_TRANSACTION_COUNT" resultType="com.b2en.integration.aster.console.util.UpperKeyMap">
+		SELECT
+			SUM(CASE WHEN  PROCESS_STTUS = 'S' THEN 1 ELSE 0 END) SUCCESS,
+			SUM(CASE WHEN  PROCESS_STTUS = 'E' THEN 1 ELSE 0 END) ERROR
+		FROM
+			TRNSC_MNTRNG
+		WHERE
+			BEGIN_DT >= #{value}
+			AND PROCESS_STTUS IN('S', 'E')
+	</select>
+
+	<select id="SELECT_ALARM_CONFIG_MANAGE_LIST" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel" resultType="com.b2en.integration.aster.console.web.console.model.AlarmModel">
+		/* [ConsoleMapper.SELECT_ALARM_CONFIG_MANAGE_LIST] 알람 관리 목록 */
+		SELECT
+			ALARM_SEQ, ALARM_SE, ALARM_TARGET, ALARM_VALUE, USER_ID, CASE WHEN ALARM_SE = 'I' THEN (SELECT INTRFC_NM FROM INTRFC_INFO I WHERE I.INTRFC_ID = A.ALARM_TARGET) ELSE '' END AS INTRFC_NM
+		FROM
+			ALARM_CONFIG_MANAGE A
+		WHERE 1=1
+		<if test="userId != null">
+			AND USER_ID = #{userId}
+		</if>
+		<if test="alarmSeq != 0">
+			AND ALARM_SEQ = #{alarmSeq}
+		</if>
+	</select>
+	<delete id="DELETE_ALARM_CONFIG_MANAGE" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel">
+		/* [ConsoleMapper.DELETE_ALARM_CONFIG_MANAGE] 알람 관리 삭제 */
+		DELETE FROM ALARM_CONFIG_MANAGE
+		WHERE
+			ALARM_SEQ = #{alarmSeq}
+	</delete>
+	<insert id="UPDATE_ALARM_CONFIG_MANAGE" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel">
+		/* [ConsoleMapper.UPDATE_ALARM_CONFIG_MANAGE] 알람 관리 등록 */
+		UPDATE
+			ALARM_CONFIG_MANAGE
+		SET
+			ALARM_SE = #{alarmSe}
+			, ALARM_TARGET = #{alarmTarget}
+			, ALARM_VALUE = #{alarmValue}
+			, USER_ID = #{userId}
+		WHERE
+			ALARM_SEQ = #{alarmSeq}
+	</insert>
+
+	<insert id="INSERT_ALARM_CONFIG_MANAGE" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel">
+		/* [ConsoleMapper.INSERT_ALARM_CONFIG_MANAGE]  알람 관리 등록 */
+		INSERT INTO ALARM_CONFIG_MANAGE
+		(ALARM_SEQ, ALARM_SE, ALARM_TARGET, ALARM_VALUE, USER_ID)
+		VALUES(
+			#{alarmSeq}
+			, #{alarmSe}
+			, #{alarmTarget}
+			, #{alarmValue}
+			, #{userId}
+		)
+	</insert>
+
+	<select id="SELECT_RESOURCE_ALARM_TARGET" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel" resultType="com.b2en.integration.aster.console.util.UpperKeyMap">
+		/* [ConsoleMapper.SELECT_RESOURCE_ALARM_TARGET]  자원 알람 전송 대상 조회 */
+		SELECT
+			COLCT_TIME
+			,AGENT_ID
+			,AGENT_NO
+			,VM_CPU_PT AS CPU
+			,USE_VM_MEMORY/ VM_MEMORY * 100  AS MEMORY
+			,USE_DISK/ DISK * 100 AS DISK
+		FROM
+			RESRCE_MNTRNG
+		WHERE
+			AGENT_ID = #{agentId}
+			AND AGENT_NO = #{agentNo}
+		<if test="alarmTarget == 'CPU'.toString()">
+			AND VM_CPU_PT > #{alarmIntValue}
+		</if>
+		<if test="alarmTarget == 'MEMORY'.toString()">
+			AND USE_VM_MEMORY / VM_MEMORY * 100 >  #{alarmIntValue}
+		</if>
+		<if test="alarmTarget == 'DISK'.toString()">
+			AND USE_DISK / DISK*100 >  #{alarmIntValue}
+		</if>
+			AND COLCT_TIME >= #{time}
+	</select>
+	<select id="SELECT_TRANSACTION_ALARM_TARGET" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel" resultType="com.b2en.integration.aster.console.util.UpperKeyMap">
+	/* [ConsoleMapper.SELECT_TRANSACTION_ALARM_TARGET]  트랜잭션 알람 전송 대상 조회 */
+	SELECT
+		TRNSC_ID
+		,T.INTRFC_ID
+		,I.INTRFC_NM
+		,BEGIN_AGENT
+		,END_AGENT
+		,TARGET_QY
+		,BEGIN_DT
+		,END_DT
+		,PROCESS_STTUS
+		,PROCESS_CN
+		,DATA_SIZE
+		,EXCP_MSSAGE
+	FROM
+		TRNSC_MNTRNG T, INTRFC_INFO I
+	WHERE
+		T.INTRFC_ID = I.INTRFC_ID
+		AND T.INTRFC_ID =  #{alarmTarget}
+		<if test="alarmValue != 'A'.toString()">
+		AND PROCESS_STTUS = #{alarmValue}
+		</if>
+		AND END_DT >= #{time}
+	</select>
+
+	<insert id="INSERT_ALARM_MESSAGE_MANAGE" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel">
+		INSERT INTO ALARM_MESSAGE_MANAGE (REGIST_DT,ALARM_SEQ, CN, SEND_YN, USER_ID)
+		VALUES(
+			#{registDt}
+			, #{alarmSeq}
+			, #{cn}
+			, #{sendYn}
+			, #{userId}
+		);
+	</insert>
+	<select id="SELECT_ALARM_MESSAGE_LIST" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel" resultType="com.b2en.integration.aster.console.web.console.model.AlarmModel">
+		/* [ConsoleMapper.SELECT_ALARM_MESSAGE_LIST]  알람 메시지 전송 대상 조회 */
+		SELECT
+			REGIST_DT, ALARM_SEQ, CN, SEND_YN, USER_ID, U.EMAIL, U.MOBLPHON_NO AS TEL_NO, U.RM
+		FROM
+			ALARM_MESSAGE_MANAGE A, USER_MANAGE U
+		WHERE U.ID = A.USER_ID
+		AND SEND_YN ='N'
+		AND REGIST_DT > #{time}
+	</select>
+	<update id="UPDATE_ALARM_MESSAGE_SEND_YN" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel" >
+		/* [ConsoleMapper.UPDATE_ALARM_MESSAGE_SEND_YN]  알람 메시지 전송 후처리*/
+		UPDATE ALARM_MESSAGE_MANAGE set SEND_YN = 'Y'
+		WHERE REGIST_DT = #{registDt}
+		AND ALARM_SEQ = #{alarmSeq}
+	</update>
+	<select id="SELECT_ALARM_MESSAGE_OLD_LIST" parameterType="com.b2en.integration.aster.console.web.console.model.AlarmModel" resultType="com.b2en.integration.aster.console.util.UpperKeyMap">
+		/* [ConsoleMapper.SELECT_ALARM_MESSAGE_OLD_LIST]  트랜잭션 알람 메시지 오래된 건 전송 대상 조회 */
+		SELECT
+			AC.ALARM_SE
+			, AC.ALARM_TARGET
+			, AM.ALARM_SEQ
+			, COUNT(1)  AS CNT
+		FROM
+			ALARM_MESSAGE_MANAGE AM
+			, ALARM_CONFIG_MANAGE AC
+		WHERE AM.ALARM_SEQ = AC.ALARM_SEQ
+		and AM.regist_dt > #{time}
+		GROUP BY  AC.ALARM_SE, AC.ALARM_TARGET, AM.ALARM_SEQ
+	</select>
+</mapper>
